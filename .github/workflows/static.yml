@@ -1,43 +1,686 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kompas Riset Komputasi — Dekonstruksi 10 Mitos Penelitian Computing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b0f;
+    --bg-radial:#14161f;
+    --surface:#14161c;
+    --surface-2:#1b1e26;
+    --border:rgba(237,238,242,0.11);
+    --border-soft:rgba(237,238,242,0.06);
+    --text:#edeef2;
+    --text-muted:#9096a5;
+    --text-faint:#5b6070;
+    --accent:#e8b355;
+    --accent-soft:rgba(232,179,85,0.14);
+    --font-display:'Fraunces', serif;
+    --font-sans:'IBM Plex Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:radial-gradient(circle at 50% 15%, var(--bg-radial) 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:var(--font-sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  a{ color:var(--accent); text-decoration-color:rgba(232,179,85,0.4); }
+  a:hover{ text-decoration-color:var(--accent); }
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  .wrap{ max-width:920px; margin:0 auto; padding:0 24px; }
 
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+  /* ---------- Header ---------- */
+  header.hero{ padding:72px 0 40px; text-align:center; }
+  .hero h1{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(2rem, 4.2vw + 1rem, 3.25rem);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 18px;
+  }
+  .hero p.lede{
+    font-size:clamp(1rem, 1vw + 0.7rem, 1.15rem);
+    color:var(--text-muted);
+    max-width:52ch;
+    margin:0 auto 22px;
+  }
+  .hero .cite{
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    color:var(--text-faint);
+  }
+
+  /* ---------- Threshold / S-curve section ---------- */
+  section.threshold{ padding:8px 0 56px; }
+  .threshold h2{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:1.4rem;
+    margin:0 0 10px;
+    text-align:center;
+  }
+  .threshold .sub{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:0.95rem;
+    max-width:56ch;
+    margin:0 auto 28px;
+  }
+  .curve-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:28px 20px 18px;
+  }
+  .curve-box svg{ width:100%; height:auto; display:block; }
+  .curve-labels{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:6px;
+  }
+  .curve-labels div{ text-align:center; }
+  .curve-labels .n{
+    font-family:var(--font-mono);
+    color:var(--accent);
+    font-size:0.85rem;
+    display:block;
+  }
+  .curve-labels .d{
+    font-size:0.82rem;
+    color:var(--text-muted);
+  }
+
+  /* ---------- Orbit section ---------- */
+  section.orbit-section{ padding:8px 0 64px; }
+  .orbit-section h2{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:1.4rem;
+    margin:0 0 8px;
+    text-align:center;
+  }
+  .orbit-section .sub{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:0.92rem;
+    max-width:52ch;
+    margin:0 auto 32px;
+  }
+
+  .stage{
+    position:relative;
+    width:min(92vw, 560px);
+    aspect-ratio:1/1;
+    margin:0 auto;
+    cursor:default;
+  }
+  .stage .ring{
+    position:absolute; inset:0;
+    border:1px solid var(--border-soft);
+    border-radius:50%;
+    margin:auto;
+    width:76%; height:76%;
+  }
+
+  .hub{
+    position:absolute; top:50%; left:50%;
+    width:78px; height:78px;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 35% 30%, #2a2416, var(--surface-2));
+    border:1px solid var(--border);
+    z-index:5;
+  }
+  .hub::before, .hub::after{
+    content:'';
+    position:absolute;
+    border-radius:50%;
+    border:1px solid var(--accent-soft);
+    animation:ping 2.4s cubic-bezier(0,0,0.2,1) infinite;
+  }
+  .hub::before{ width:78px; height:78px; }
+  .hub::after{ width:78px; height:78px; animation-delay:1.2s; }
+  @keyframes ping{
+    0%{ transform:scale(1); opacity:0.6; }
+    100%{ transform:scale(1.9); opacity:0; }
+  }
+  .hub span{
+    font-family:var(--font-mono);
+    font-size:0.62rem;
+    color:var(--accent);
+    text-align:center;
+    line-height:1.25;
+    padding:0 8px;
+  }
+
+  .node{
+    position:absolute; top:0; left:0;
+    display:flex; flex-direction:column; align-items:center;
+    background:none; border:none; padding:0; margin:0;
+    cursor:pointer;
+    transition:transform 0.5s cubic-bezier(0.22,0.61,0.36,1), opacity 0.4s ease;
+    z-index:3;
+  }
+  .node.is-selected{ z-index:6; }
+  .node.is-dim{ opacity:0.38; }
+
+  .node .dot{
+    width:clamp(30px, 6.5vw, 42px);
+    height:clamp(30px, 6.5vw, 42px);
+    border-radius:50%;
+    background:var(--surface);
+    border:2px solid var(--dim-color, var(--border));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    color:var(--text);
+    transition:transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  }
+  .node.is-selected .dot{
+    transform:scale(1.28);
+    background:var(--dim-color);
+    color:#0a0b0f;
+    box-shadow:0 0 0 6px color-mix(in srgb, var(--dim-color) 20%, transparent);
+  }
+  .node:hover .dot{ transform:scale(1.1); }
+
+  .node .label{
+    margin-top:8px;
+    font-size:0.68rem;
+    color:var(--text-muted);
+    max-width:92px;
+    text-align:center;
+    line-height:1.2;
+    opacity:0;
+    transition:opacity 0.25s ease;
+    white-space:normal;
+  }
+  .node:hover .label,
+  .node:focus-visible .label,
+  .node.is-selected .label{ opacity:1; }
+  .node.is-selected .label{ color:var(--text); }
+
+  @media (prefers-reduced-motion: reduce){
+    .node{ transition:none; }
+    .hub::before, .hub::after{ animation:none; }
+  }
+
+  /* ---------- Detail panel ---------- */
+  .detail{
+    margin:36px auto 0;
+    max-width:600px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:30px 28px;
+    min-height:200px;
+  }
+  .detail-empty{
+    color:var(--text-muted);
+    text-align:center;
+    font-size:0.95rem;
+    padding:36px 10px;
+  }
+  .detail-content[hidden]{ display:none; }
+
+  .detail-head{
+    display:flex; align-items:flex-start; gap:16px;
+    margin-bottom:20px;
+  }
+  .detail-index{
+    font-family:var(--font-mono);
+    font-size:1.6rem;
+    color:var(--dim-color, var(--accent));
+    line-height:1;
+    padding-top:2px;
+  }
+  .detail-dim{
+    display:inline-block;
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    padding:3px 9px;
+    border-radius:999px;
+    border:1px solid var(--dim-color, var(--border));
+    color:var(--dim-color, var(--text-muted));
+    margin-bottom:8px;
+  }
+  .detail-title{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(1.2rem, 1.5vw + 0.9rem, 1.55rem);
+    margin:0;
+    line-height:1.25;
+  }
+
+  .detail-block{ margin-bottom:18px; }
+  .detail-block h4{
+    font-size:0.82rem;
+    font-weight:600;
+    color:var(--dim-color, var(--accent));
+    margin:0 0 6px;
+  }
+  .detail-block p{
+    margin:0;
+    font-size:0.94rem;
+    color:#d6d8de;
+    max-width:64ch;
+    line-height:1.62;
+  }
+
+  .detail-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:22px; padding-top:18px;
+    border-top:1px solid var(--border-soft);
+  }
+  .detail-nav button{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    width:36px; height:36px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:1rem;
+    transition:background 0.2s ease;
+  }
+  .detail-nav button:hover{ background:var(--border); }
+  .detail-nav .counter{
+    font-family:var(--font-mono);
+    font-size:0.8rem;
+    color:var(--text-faint);
+  }
+
+  /* ---------- Blueprint ---------- */
+  section.blueprint{ padding:8px 0 64px; }
+  .blueprint h2{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:1.4rem;
+    margin:0 0 8px;
+    text-align:center;
+  }
+  .blueprint .sub{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:0.92rem;
+    max-width:52ch;
+    margin:0 auto 32px;
+  }
+  .steps{
+    max-width:600px;
+    margin:0 auto;
+    border-left:1px solid var(--border);
+    padding-left:26px;
+  }
+  .step{
+    position:relative;
+    padding-bottom:28px;
+  }
+  .step:last-child{ padding-bottom:0; }
+  .step::before{
+    content:'';
+    position:absolute;
+    left:-31px; top:4px;
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  .step .num{
+    font-family:var(--font-mono);
+    font-size:0.75rem;
+    color:var(--text-faint);
+    display:block;
+    margin-bottom:4px;
+  }
+  .step h3{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:1.1rem;
+    margin:0 0 6px;
+  }
+  .step p{
+    margin:0;
+    font-size:0.9rem;
+    color:var(--text-muted);
+    max-width:58ch;
+    line-height:1.55;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--border-soft);
+    padding:32px 0 56px;
+    text-align:center;
+  }
+  footer .closing{
+    font-family:var(--font-display);
+    font-size:1.05rem;
+    color:var(--text);
+    max-width:54ch;
+    margin:0 auto 18px;
+    line-height:1.5;
+  }
+  footer .cite{
+    font-family:var(--font-mono);
+    font-size:0.75rem;
+    color:var(--text-faint);
+    max-width:60ch;
+    margin:0 auto;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Kompas Riset Komputasi</h1>
+    <p class="lede">Sepuluh anggapan keliru yang membuat mahasiswa computing tersesat menulis skripsi — dan logika riset yang sesungguhnya berlaku di baliknya.</p>
+    <p class="cite">Berdasarkan paparan <a href="https://youtu.be/4WFuNc1Pjts?si=VyohlQ12mo1vGAhN" target="_blank" rel="noopener">Dr. Romi Satria Wahono, M.Eng.</a> dalam video kuliahnya</p>
+  </div>
+</header>
+
+<section class="threshold">
+  <div class="wrap">
+    <h2>Ambang batas kejernihan</h2>
+    <p class="sub">Kebingungan membaca jurnal bukan tanda kebanyakan baca — justru tanda belum cukup baca pada satu ceruk topik yang sama.</p>
+    <div class="curve-box">
+      <svg viewBox="0 0 600 160" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Kurva S ambang batas kejernihan membaca riset">
+        <path d="M 30 130 C 160 130, 190 40, 300 40 S 460 20, 570 20" fill="none" stroke="#3a3d47" stroke-width="2"/>
+        <circle cx="30" cy="130" r="6" fill="#8a8f9c"/>
+        <circle cx="300" cy="40" r="7" fill="#e8b355"/>
+        <circle cx="570" cy="20" r="6" fill="#8a8f9c"/>
+      </svg>
+      <div class="curve-labels">
+        <div><span class="n">1–15 paper</span><span class="d">Disonansi kognitif</span></div>
+        <div><span class="n">20+ paper</span><span class="d">Titik terang</span></div>
+        <div><span class="n">50+ paper</span><span class="d">Penguasaan SOTA</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="orbit-section">
+  <div class="wrap">
+    <h2>Sepuluh mitos yang mengorbit</h2>
+    <p class="sub">Ketuk salah satu simpul untuk membuka dekonstruksinya — akar kesalahannya, realitas ilmiahnya, dan implikasinya bagi skripsi atau tesismu.</p>
+
+    <div class="stage" id="stage">
+      <div class="ring"></div>
+      <div class="hub"><span>Inti<br>Metodologi</span></div>
+    </div>
+
+    <div class="detail" id="detail">
+      <div class="detail-empty" id="detailEmpty">Belum ada mitos yang dipilih. Ketuk salah satu simpul di orbit di atas untuk memulai.</div>
+      <article class="detail-content" id="detailContent" hidden>
+        <div class="detail-head">
+          <span class="detail-index" id="detailIndex">01</span>
+          <div>
+            <span class="detail-dim" id="detailDim">Dimensi</span>
+            <h3 class="detail-title" id="detailTitle">Judul mitos</h3>
+          </div>
+        </div>
+        <div class="detail-block">
+          <h4>Akar kesesatan</h4>
+          <p id="detailAkar"></p>
+        </div>
+        <div class="detail-block">
+          <h4>Realitas &amp; pembuktian</h4>
+          <p id="detailRealitas"></p>
+        </div>
+        <div class="detail-block">
+          <h4>Implikasi bagi mahasiswa</h4>
+          <p id="detailImplikasi"></p>
+        </div>
+        <div class="detail-nav">
+          <button id="prevBtn" aria-label="Mitos sebelumnya" type="button">←</button>
+          <span class="counter" id="detailCounter">1 / 10</span>
+          <button id="nextBtn" aria-label="Mitos berikutnya" type="button">→</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="blueprint">
+  <div class="wrap">
+    <h2>Lima langkah merancang riset yang berbobot</h2>
+    <p class="sub">Begitu sepuluh mitos di atas gugur, begini alur menyusun riset computing yang sahih secara ilmiah.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <h3>Temukan epistemic gap</h3>
+        <p>Telaah 20–30 paper bereputasi pada satu sub-topik yang sama, lalu cari kelemahan metode state-of-the-art saat ini.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3>Rumuskan proposed method</h3>
+        <p>Tentukan intervensi metodologis untuk mengatasi kelemahan tersebut — bukan sekadar menerapkan metode lama ke objek baru.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3>Tulis masalah sebagai pengukuran</h3>
+        <p>Gunakan format "seberapa besar peningkatan…", bukan "bagaimana cara membuat…". Masalah riset diukur, bukan direkayasa.</p>
+      </div>
+      <div class="step">
+        <span class="num">04</span>
+        <h3>Rancang eksperimen terkontrol</h3>
+        <p>Tetapkan dataset publik, skema validasi seperti 10-fold cross validation, dan metrik evaluasi yang objektif.</p>
+      </div>
+      <div class="step">
+        <span class="num">05</span>
+        <h3>Sintesis dan diseminasi etis</h3>
+        <p>Parafrase seluruh literatur, sajikan hasil secara transparan — termasuk anomali — dan terbitkan sebagai satu publikasi utuh.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="closing">Riset computing bukan soal membangun aplikasi baru, tapi soal menggeser sedikit saja batas yang sudah diketahui dunia — dengan cara yang jujur dan bisa dipertanggungjawabkan.</p>
+    <p class="cite">Disusun berdasarkan paparan Dr. Romi Satria Wahono, M.Eng. dalam video kuliahnya serta dokumen analisis "Kompas Riset Komputasi: Dekonstruksi 10 Mitos Penelitian Computing". Ditulis ulang dalam bentuk parafrase dan sintesis, bukan kutipan langsung.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var mitosData = [
+    { id:1, dim:"Produk Riset", title:"Riset wajib menghasilkan software",
+      akar:"Mencampuradukkan peran software builder (insinyur industri) dengan researcher (peneliti sains komputasi).",
+      realitas:"Kode program hanyalah instrumen testbed untuk mengukur validitas metode yang diusulkan. Jurnal bereputasi seperti IEEE, ACM, Elsevier, atau Springer tidak pernah melampirkan listing kode berlembar-lembar atau diagram UML. Bahkan perbaikan performa algoritma sah dihitung lewat lembar sebar, asal tahapan iterasinya terbukti secara matematis.",
+      implikasi:"Fokuslah menyempurnakan algoritma atau formula, bukan membangun aplikasi bisnis berbasis CRUD." },
+    { id:2, dim:"Orientasi Hasil", title:"Tujuan riset wajib berdampak ke masyarakat",
+      akar:"Menyamakan \"Tujuan Penelitian\" dengan \"Manfaat Penelitian\".",
+      realitas:"Menurut Dawson (2009), riset bertujuan menghasilkan kontribusi orisinal pada pengetahuan. Dampak sosial adalah efek samping (by-product) jangka panjang, bukan target langsung. Pada riset klasifikasi penyakit jantung misalnya, kontribusi ilmiahnya adalah modifikasi split criteria algoritma pohon keputusan — turunnya angka kematian hanyalah manfaat, bukan tujuan.",
+      implikasi:"Tulis target ilmiah yang terukur sebagai tujuan penelitian; taruh manfaat sosial di sub-bab terpisah." },
+    { id:3, dim:"Metodologi Bab 3", title:"Metode Bab 3 adalah SDLC",
+      akar:"Menukar instrumen rekayasa produk (SDLC) dengan instrumen penemuan kebenaran ilmiah.",
+      realitas:"Waterfall, Prototyping, V-Model, dan Agile/Scrum adalah metodologi pengembangan perangkat lunak, bukan metodologi penelitian. Menurut taksonomi Dawson, metode riset ilmiah terbagi menjadi Action Research, Experiment, Case Study, dan Survey — riset computing umumnya memakai eksperimen terkontrol.",
+      implikasi:"Bab 3 memuat protokol dataset, preprocessing, skema validasi (k-fold), dan metrik evaluasi — bukan bagan SDLC." },
+    { id:4, dim:"Asal Masalah", title:"Masalah riset dari kehidupan nyata atau magang",
+      akar:"Menyamakan real-world problem dengan epistemic research problem.",
+      realitas:"Kemacetan, banjir, atau pencatatan manual di tempat magang hanyalah latar belakang kontekstual pada Bab 1.1. Masalah penelitian sejati ditemukan di paper jurnal, saat metode state-of-the-art menunjukkan anomali atau keterbatasan — ditandai frasa seperti \"however\", \"nevertheless\", atau \"the main drawback is\".",
+      implikasi:"Cari gap di jurnal mutakhir; lokasi magang hanya sumber data opsional, bukan sumber masalah." },
+    { id:5, dim:"Kajian Pustaka", title:"Bab 2 berisi kamus definisi dari buku teks",
+      akar:"Menganggap tinjauan pustaka sama seperti rangkuman materi ujian sekolah.",
+      realitas:"Definisi klise seperti \"PHP adalah bahasa skrip\" atau \"database adalah sekumpulan data\" adalah faktor utama tingginya skor Turnitin. Bab 2 seharusnya memetakan state-of-the-art: peneliti terdahulu, metode yang mereka usulkan, dataset, metrik pembuktian, dan celah riset yang belum terselesaikan.",
+      implikasi:"Bangun tabel pemetaan komparatif metode-metode terdahulu, bukan daftar definisi dasar." },
+    { id:6, dim:"Volume Bacaan", title:"Makin banyak baca, makin pusing",
+      akar:"Membaca serampangan lintas topik tanpa fokus tematik, lalu menyerah sebelum menembus ambang pemahaman.",
+      realitas:"Pusing muncul bukan karena kebanyakan bacaan, melainkan karena bacaan belum cukup atau melompat-lompat antar topik yang tak berhubungan. Setelah 20–30 paper dibaca disiplin pada satu ceruk masalah yang sama, pola perdebatan ilmiah dan nama-nama peneliti kunci mulai terlihat jelas.",
+      implikasi:"Disiplinkan diri membaca 20–70 paper pada satu sub-topik spesifik, bukan menyebar ke banyak domain." },
+    { id:7, dim:"Skala Riset", title:"Riset berkualitas harus berskala raksasa",
+      akar:"Terkecoh kemasan megah proyek teknologi praktis dibanding kedalaman kontribusi sains murni.",
+      realitas:"Jurnal-jurnal paling prestisius justru mengejar riset yang sempit cakupannya tapi dalam, ketat, dan berdampak tinggi. Modifikasi kecil pada rumus C4.5 oleh Mantas (2013) meruntuhkan klaim algoritma terdahulu dan dirujuk ratusan peneliti, sementara penerapan algoritma lama ke ratusan objek berbeda tanpa kebaruan metode tidak membawa kontribusi ilmiah sama sekali.",
+      implikasi:"Jangan gonta-ganti objek studi; beranikan diri memperdalam satu parameter formula secara tuntas." },
+    { id:8, dim:"Kompetensi S3", title:"Doktor/PhD harus menguasai segala hal",
+      akar:"Mengira gelar akademik tertinggi mencerminkan sosok generalis yang serba bisa.",
+      realitas:"Pendidikan bergerak dari keterbukaan horizontal di SD-SMA menuju spesialisasi vertikal yang makin runcing di S1, S2, hingga S3. Gelar Doktor diraih bukan karena menguasai instalasi router atau pemrograman mikrokontroler sekaligus, melainkan karena berhasil menciptakan \"a tiny dent\" pada batas pengetahuan manusia di satu titik yang sangat spesifik.",
+      implikasi:"Arahkan riset pascasarjana pada kebaruan yang sangat sempit dan mendalam, bukan cakupan yang luas." },
+    { id:9, dim:"Etika Sitasi", title:"Copy-paste boleh asal ada nama penulis",
+      akar:"Salah kaprah antara sitasi yang sah dan perampasan ekspresi tekstual orang lain.",
+      realitas:"Menyalin kalimat atau paragraf utuh tetap tergolong plagiarisme tekstual meski nama penulis dicantumkan di ujung kalimat — dan akan terdeteksi oleh Turnitin atau iThenticate. Kaidah akademik mewajibkan parafrase: mencerna gagasan penulis asli lalu menuliskannya kembali dengan diksi dan struktur kalimat sendiri, serta menghindari sitasi sekunder berantai.",
+      implikasi:"Perlakukan daftar pustaka sebagai daftar sitasi aktif, dan rujuk sumber primer secara langsung." },
+    { id:10, dim:"Integritas Publikasi", title:"Satu eksperimen boleh dipecah ke banyak jurnal",
+      akar:"Mentalitas transaksional kuantitatif dalam publikasi ilmiah, dikenal sebagai salami slicing.",
+      realitas:"Memecah satu data eksperimen menjadi artikel-artikel tipis, atau menerbitkan hasil identik ke beberapa jurnal, adalah pelanggaran berat integritas ilmiah yang bisa berujung retraction atau blacklisting. Kaidahnya: satu kontribusi orisinal sama dengan satu publikasi — dan temuan negatif pun tetap sah dipublikasikan bila disajikan transparan.",
+      implikasi:"Susun satu publikasi yang utuh, termasuk analisis jujur atas temuan yang gagal sekalipun." }
+  ];
+
+  var palette = mitosData.map(function(m, i){
+    var hue = (200 + i * 36) % 360;
+    return 'hsl(' + hue + ', 46%, 62%)';
+  });
+
+  var stage = document.getElementById('stage');
+  var detailEmpty = document.getElementById('detailEmpty');
+  var detailContent = document.getElementById('detailContent');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var state = { rotation:0, autoRotate:!reduceMotion, selectedId:null, paused:false };
+  var nodeEls = [];
+
+  mitosData.forEach(function(m, i){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'node';
+    btn.style.setProperty('--dim-color', palette[i]);
+    btn.setAttribute('aria-label', 'Mitos ' + m.id + ': ' + m.title);
+
+    var dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.textContent = String(m.id).padStart(2,'0');
+
+    var label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = m.title;
+
+    btn.appendChild(dot);
+    btn.appendChild(label);
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      selectNode(m.id);
+    });
+
+    stage.appendChild(btn);
+    nodeEls.push(btn);
+  });
+
+  function layout(){
+    var rect = stage.getBoundingClientRect();
+    var radius = rect.width * 0.38;
+    var cx = rect.width / 2, cy = rect.height / 2;
+    nodeEls.forEach(function(el, i){
+      var angle = (i / mitosData.length) * 360 + state.rotation - 90;
+      var rad = angle * Math.PI / 180;
+      var x = cx + radius * Math.cos(rad);
+      var y = cy + radius * Math.sin(rad);
+      el.style.transform = 'translate(' + x + 'px, ' + y + 'px) translate(-50%, -50%)';
+    });
+  }
+
+  function updateNodeClasses(){
+    nodeEls.forEach(function(el, i){
+      var id = mitosData[i].id;
+      el.classList.toggle('is-selected', id === state.selectedId);
+      el.classList.toggle('is-dim', state.selectedId !== null && id !== state.selectedId);
+    });
+  }
+
+  function renderDetail(id){
+    var m = mitosData.find(function(x){ return x.id === id; });
+    if(!m) return;
+    var idx = mitosData.indexOf(m);
+    detailEmpty.hidden = true;
+    detailContent.hidden = false;
+    detailContent.style.setProperty('--dim-color', palette[idx]);
+    document.getElementById('detailIndex').textContent = String(m.id).padStart(2,'0');
+    document.getElementById('detailIndex').style.color = palette[idx];
+    var dimEl = document.getElementById('detailDim');
+    dimEl.textContent = m.dim;
+    dimEl.style.setProperty('--dim-color', palette[idx]);
+    document.getElementById('detailTitle').textContent = m.title;
+    document.getElementById('detailAkar').textContent = m.akar;
+    document.getElementById('detailRealitas').textContent = m.realitas;
+    document.getElementById('detailImplikasi').textContent = m.implikasi;
+    document.getElementById('detailCounter').textContent = m.id + ' / ' + mitosData.length;
+  }
+
+  function renderEmpty(){
+    detailEmpty.hidden = false;
+    detailContent.hidden = true;
+  }
+
+  function selectNode(id){
+    var idx = mitosData.findIndex(function(m){ return m.id === id; });
+    var currentAngle = (idx / mitosData.length) * 360 + state.rotation;
+    var delta = (-90 - currentAngle);
+    delta = ((delta % 360) + 540) % 360 - 180;
+    state.rotation += delta;
+    state.selectedId = id;
+    state.autoRotate = false;
+    layout();
+    updateNodeClasses();
+    renderDetail(id);
+  }
+
+  function deselect(){
+    state.selectedId = null;
+    state.autoRotate = !reduceMotion;
+    updateNodeClasses();
+    renderEmpty();
+  }
+
+  stage.addEventListener('click', function(e){
+    if(e.target === stage || e.target.closest('.ring') || e.target.closest('.hub')){
+      deselect();
+    }
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', function(){
+    if(state.selectedId === null) return;
+    var n = state.selectedId - 1; if(n < 1) n = mitosData.length;
+    selectNode(n);
+  });
+  document.getElementById('nextBtn').addEventListener('click', function(){
+    if(state.selectedId === null) return;
+    var n = state.selectedId + 1; if(n > mitosData.length) n = 1;
+    selectNode(n);
+  });
+
+  stage.addEventListener('mouseenter', function(){ state.paused = true; });
+  stage.addEventListener('mouseleave', function(){ state.paused = false; });
+
+  window.addEventListener('resize', layout);
+
+  layout();
+
+  if(!reduceMotion){
+    setInterval(function(){
+      if(state.autoRotate && !state.paused){
+        state.rotation = (state.rotation + 0.12) % 360;
+        layout();
+      }
+    }, 40);
+  }
+})();
+</script>
+</body>
+</html>
